@@ -1,0 +1,121 @@
+@model QuanLyThuVien.Models.BorrowSlip
+
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng {Model.SlipCode} - Lab 6";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary mb-0"><i class="bi bi-file-earmark-text"></i> Chi Tiết Hóa Đơn / Phiếu Mượn: <code>@Model.SlipCode</code></h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- THÔNG TIN CHUNG ĐƠN HÀNG -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-dark text-white fw-bold">
+            Thông Tin Chung Đơn Hàng
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="text-muted small">Mã hóa đơn / phiếu mượn:</div>
+                    <div class="fw-bold fs-5 text-primary">@Model.SlipCode</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Tên nhân viên tạo đơn:</div>
+                    <div class="fw-bold">@(Model.Employee?.FullName ?? "N/A") (@(Model.Employee?.EmployeeCode ?? ""))</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Ngày tạo đơn:</div>
+                    <div class="fw-bold">@Model.BorrowDate.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Độc giả / Khách hàng:</div>
+                    <div class="fw-bold">@(Model.Reader?.FullName ?? "N/A") (@(Model.Reader?.ReaderCode ?? ""))</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Trạng thái đơn hàng:</div>
+                    <div>
+                        <span class="badge fs-6 @(Model.Status == "Cancelled" ? "bg-danger" : (Model.Status == "Borrowing" ? "bg-warning text-dark" : "bg-success"))">
+                            @Model.Status
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-muted small">Tổng tiền đơn hàng:</div>
+                    <div class="fw-bold fs-4 text-danger">@Model.TotalAmount.ToString("N0") VNĐ</div>
+                </div>
+            </div>
+
+            <hr />
+            <form asp-action="UpdateStatus" method="post" class="d-flex align-items-center gap-2">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <label class="fw-bold small text-muted mb-0">Cập nhật trạng thái nhanh:</label>
+                <select name="status" class="form-select form-select-sm" style="width: 180px;">
+                    <option value="Paid" selected="@(Model.Status == "Paid")">Paid (Đã thanh toán)</option>
+                    <option value="Borrowing" selected="@(Model.Status == "Borrowing")">Borrowing (Đang mượn)</option>
+                    <option value="Returned" selected="@(Model.Status == "Returned")">Returned (Đã trả đủ)</option>
+                    <option value="Cancelled" selected="@(Model.Status == "Cancelled")">Cancelled (Đã hủy)</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline-primary">Lưu trạng thái</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHI TIẾT DANH SÁCH SẢN PHẨM / SÁCH TRONG ĐƠN -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white fw-bold">
+            Danh Sách Sách / Sản Phẩm Trong Đơn
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-striped mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Mã ISBN</th>
+                        <th>Tên sách (Sản phẩm)</th>
+                        <th>Thể loại</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-end">Đơn giá</th>
+                        <th class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int stt = 1;
+                    }
+                    @foreach (var detail in Model.BorrowDetails)
+                    {
+                        <tr>
+                            <td>@(stt++)</td>
+                            <td><code>@detail.Book?.ISBN</code></td>
+                            <td class="fw-bold">@detail.Book?.Title</td>
+                            <td><span class="badge bg-info text-dark">@(detail.Book?.Category?.Name ?? "Khác")</span></td>
+                            <td class="text-center fw-bold">@detail.Quantity</td>
+                            <td class="text-end">@detail.UnitPrice.ToString("N0") đ</td>
+                            <td class="text-end fw-bold text-primary">@detail.LineTotal.ToString("N0") đ</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot class="table-light">
+                    <tr>
+                        <td colspan="4" class="text-end fw-bold">Tổng cộng:</td>
+                        <td class="text-center fw-bold">@Model.BorrowDetails.Sum(x => x.Quantity) cuốn</td>
+                        <td></td>
+                        <td class="text-end fw-bold fs-5 text-danger">@Model.TotalAmount.ToString("N0") VNĐ</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

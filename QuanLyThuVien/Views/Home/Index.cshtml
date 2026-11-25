@@ -1,0 +1,68 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ - Hệ thống Thư viện Điện tử (Lab 6)";
+}
+
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm border">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold text-primary">📊 Quản Lý Hóa Đơn &amp; Thống Kê Thư Viện</h1>
+        <p class="col-md-10 fs-5 text-muted">
+            Bài thực hành <strong>LAB 6</strong> (EF Core 8.0 Code First): Quản lý danh sách &amp; chi tiết hóa đơn/phiếu mượn phía Quản lý, Thống kê Top 5 sách mượn nhiều nhất, Doanh thu theo khoảng thời gian và Trực quan hóa biểu đồ với <strong>Chart.js</strong>.
+        </p>
+        <div class="mb-4">
+            <span class="badge bg-secondary p-2 me-1">Môn học: NET108 / SOF1022</span>
+            <span class="badge bg-info text-dark p-2 me-1">Sinh viên: TB02357</span>
+            <span class="badge bg-dark p-2">Nhóm thực hiện: Nhóm 5</span>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+            @if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="BorrowSlips" asp-action="Index" class="btn btn-primary btn-lg shadow-sm">
+                    <i class="bi bi-receipt"></i> Quản Lý Hóa Đơn / Phiếu Mượn
+                </a>
+                <a asp-controller="Statistics" asp-action="Index" class="btn btn-success btn-lg shadow-sm">
+                    <i class="bi bi-bar-chart-line"></i> Xem Thống Kê &amp; Biểu Đồ Chart.js
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg shadow-sm">
+                    <i class="bi bi-box-arrow-in-right"></i> Đăng Nhập Quyền Quản Lý (Admin)
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-primary"><i class="bi bi-receipt-cutoff"></i> Bài 1: Quản Lý Hóa Đơn</h5>
+                <p class="card-text text-muted">
+                    Hiển thị toàn bộ đơn mượn trả, xem chi tiết từng sách, số lượng, đơn giá, tổng tiền, trạng thái, tên nhân viên tạo đơn và ngày tạo đơn.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-success"><i class="bi bi-trophy"></i> Bài 2: Thống Kê Dữ Liệu</h5>
+                <p class="card-text text-muted">
+                    Truy vấn LINQ EF Core thống kê Top 5 sách được mượn nhiều nhất và tổng hợp doanh thu theo khoảng thời gian tùy chọn (Từ ngày - Đến ngày).
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-warning"><i class="bi bi-graph-up"></i> Bài 3: Biểu Đồ Chart.js</h5>
+                <p class="card-text text-muted">
+                    Nhúng Chart.js CDN, truyền dữ liệu từ <code>ViewBag</code> bằng <code>@@Json.Serialize(...)</code> lên thẻ <code>&lt;canvas id="myChart"&gt;</code>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
